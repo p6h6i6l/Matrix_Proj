@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <complex>
-//#include "Constants.h"
+#include "Constants.h"
 //#include "Ring.h"
 #include "Matrix.h"
 //#include "RationalNumber.h"
@@ -22,10 +22,13 @@ int main(int argc, char const *argv[])
 	std::complex<double> z6(-105,252);
 	std::complex<double> z7(-14,-21);
 	std::complex<double> z8(1,0);
+	std::complex<double> z9(2,0);
 	std::vector<std::complex<double>> v1 = {z1,z2};
 	std::vector<std::complex<double>> v2 = {z1, z2, z3, z4, z5, z6, z7, z8};
 	std::vector<std::complex<double>> v3 = {z1, z2};
 	std::vector<std::complex<double>> v4 = {z1, -z2};
+	std::vector<std::complex<double>> v5 = {z8, z9, z8};
+	std::vector<std::complex<double>> v6 = {z8, z8};
 	/*for(size_t j = 0; j < v.size(); ++j)
 	{
 		std::cout<< v[j];
@@ -37,12 +40,16 @@ int main(int argc, char const *argv[])
 	Polynom q2(v2);
 	//std::cout<<q2;
 	Polynom q3 = q1*q2;
-	std::cout<<q3;
-	std::vector<std::complex<double>> roots = (q2*q2).FindRoots();
-	for(size_t j = 0; j < roots.size(); ++j)
+	//std::cout<<q3;
+	//std::vector<std::complex<double>> roots = (q2*q2).FindRoots();
+	/*for(size_t j = 0; j < roots.size(); ++j)
 	{
 		std::cout<< roots[j]<<std::endl << (q2*q2).ValueInPoint(roots[j]) << "<- vALiNRoot"<<std::endl;
 	}
-	std::cout<<q2;
+	std::cout<<q2;*/
+    Polynom q4(v5);
+    Polynom q5(v6);
+    std::vector<Polynom> tmp1 = DivideTwoPolynom(q4,q5);
+    out_vector<Polynom>(tmp1);
 	return 0;
 }
