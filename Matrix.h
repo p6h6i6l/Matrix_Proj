@@ -189,8 +189,8 @@ T epsilon;
 				{
 					swap_lines(a,j);
 					b.swap_lines(a,j);
-					b.multiply_by_constant(1/(Head[a][i]), a);
-					multiply_by_constant(1/(Head[a][i]), a);
+					b.multiply_by_constant(T(1)/(Head[a][i]), a);
+					multiply_by_constant(T(1)/(Head[a][i]), a);
 					for(size_t k = a+1; k < wight; k++)
 					{
 						b.sum_multiplied_first_to_second(a,k, -Head[k][i]);
