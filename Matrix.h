@@ -56,6 +56,7 @@ std::vector< std::vector <T> > Head;
 		}
 	}
 
+
 	Matrix& operator = (const Matrix& another)
 	{
 		if (&another == this)
@@ -198,40 +199,22 @@ std::vector< std::vector <T> > Head;
 		//Защита от дурачка
 		if (wight != length){
 			std::cout << "This matrix doesn't have determinant" << std::endl;
-			return 0;
+			std::exit(0);
 		}
-		if (wight = 2){
+		if (wight == 2){
 			return Head[0][0]*Head[1][1] - Head[1][0]*Head[0][1];
 		}else{
 			T sum;
 			for (size_t i= 0; i < length; i++){
-				sum += std::pow(-1, i+2)*Head[0][i]*((Submatrix(1, i+1)).Det());
+				if ((i+2)%2 == 0){
+					sum += Head[0][i]*((Submatrix(1, i+1)).Det());
+				}else{
+					sum += -Head[0][i]*((Submatrix(1, i+1)).Det());
+				}
 			}
 			return sum;
 		}
 	}
-
-
-	Matrix& make_one()
-	{
-		for(size_t i = 0; i < length; i++)
-		{
-			for(size_t j = 0 ; j < wight; j++)
-			{
-				if(i == j)
-				{
-					Head[i][j] = 1;
-				}
-				else
-				{
-					Head[i][j] = 0;
-				}
-				
-			}
-		}
-		return *this;
-	}
-
 
 	void out_matrix()
 	{
@@ -326,12 +309,21 @@ std::vector< std::vector <T> > Head;
 };
 
 template <typename T>
-Matrix<Polynom> ToPolynom( Matrix<T>& b){
+Matrix<Polynom> ToCharPolynom( Matrix<T>& b){
 		std::vector< std::vector< Polynom > > Head_polynom;
-		for (size_t i = 0; i<b.wight; i++){
+		for (size_t i = 0; i<b.wight; i++)
+		{
 			std::vector<Polynom> polynom_str;
-			for (size_t j = 0; j<b.length; j++){
+			for (size_t j = 0; j<b.length; j++)
+			{
+				if (i==j)
+				{
+					std::vector<std::complex<T>> elem = {b.Head[i][j], -1};
+					polynom_str.push_back(Polynom(elem));
+				}else
+				{
 				polynom_str.push_back(Polynom(b.Head[i][j]));
+				}
 			}
 			Head_polynom.push_back(polynom_str);
 		}
