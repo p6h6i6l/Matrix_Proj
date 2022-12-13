@@ -141,6 +141,19 @@ T epsilon;
 		return *this;
 	}
 
+	Matrix Submatrix(size_t line, size_t column)
+	{
+		std::vector< std::vector<T> > Head_minor = Head;
+		auto begin = Head_minor.cbegin();
+		Head_minor.erase(begin + line - 1);
+		for (size_t i = 0; i<length-1; i++)
+		{
+			auto begin1 = Head_minor[i].cbegin();
+			Head_minor[i].erase(begin1 + column - 1);
+		}
+		return Matrix(wight-1, length-1, Head_minor);
+	}
+
 
 	Matrix& make_one()
 	{
@@ -228,6 +241,27 @@ T epsilon;
 		return *this;
 	}
 
+	/*Matrix& GaussMethod(Matrix &b){
+		ToUpTringled(b);
+		ToLed(b);
+		int flag = 0;
+		for (size_t i = wight-1; i+1>0; i--)
+		{
+			if ( std::abs(b.Head[i][0]) < epsilon){
+				for (size_t j = 0; j < length; j++){
+					if (std::abs(Head[i][j]) > epsilon){flag++;}
+				}
+			}
+		}
+		if (flag != 0){
+			std::cout<<"can't be solved :(";
+		}else{
+			for  (size_t i =0; i<wight; i++){
+				std::cout<< b.Head[i][0] << std::endl;
+			}
+		}
+		return *this;
+	}*/
 
 	~Matrix(){}
 	
