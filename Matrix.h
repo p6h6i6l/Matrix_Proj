@@ -6,7 +6,6 @@ public:
 size_t length; 
 size_t wight;
 std::vector< std::vector <T> > Head;
-T epsilon;
 
 	Matrix()
 	{
@@ -17,7 +16,6 @@ T epsilon;
 
 	Matrix(size_t wight_, size_t length_)
 	{
-		epsilon = 0.0001;
 		std::random_device r;
  		std::default_random_engine e1(r());
 		std::uniform_int_distribution<int> uniform_dist(0, 1);
@@ -38,7 +36,6 @@ T epsilon;
 
 	Matrix(size_t wight_, size_t length_, std::vector< std::vector<T> > pool)
 	{
-		epsilon = 0.0001;
 		length = length_;
 		wight = wight_;
 		Head = pool;
@@ -279,3 +276,16 @@ T epsilon;
 	
 
 };
+
+template <typename T>
+Matrix<Polynom> ToPolynom( Matrix<T>& b){
+		std::vector< std::vector< Polynom > > Head_polynom;
+		for (size_t i = 0; i<b.wight; i++){
+			std::vector<Polynom> polynom_str;
+			for (size_t j = 0; j<b.length; j++){
+				polynom_str.push_back(Polynom(b.Head[i][j]));
+			}
+			Head_polynom.push_back(polynom_str);
+		}
+		return Matrix<Polynom>(b.wight, b.length, Head_polynom);
+	}
