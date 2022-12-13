@@ -18,7 +18,7 @@ std::vector< std::vector <T> > Head;
 	{
 		std::random_device r;
  		std::default_random_engine e1(r());
-		std::uniform_int_distribution<int> uniform_dist(0, 1);
+		std::uniform_int_distribution<int> uniform_dist(0, 100);
 
 		length = length_;
 		wight = wight_;
@@ -56,7 +56,6 @@ std::vector< std::vector <T> > Head;
 		}
 	}
 
-
 	Matrix& operator = (const Matrix& another)
 	{
 		if (&another == this)
@@ -68,12 +67,55 @@ std::vector< std::vector <T> > Head;
 		return *this;
 	}
 
+	Matrix operator + (const Matrix& another) const
+	{
+		if(wight != another.wight || length != another.length){
+			std::cout<< "Matrix has different sizes. Can't sum." << std::endl;
+			return *this;
+		}
+		std::vector<std::vector<T>> tmp;
+		for (size_t i = 0; i < wight; i++)
+		{	
+			std::vector<T> tmp_str;
+			for (size_t j = 0; j < length; j++)
+			{
+				tmp_str.push_back(Head[i][j] + another.Head[i][j]);
+			}
+			tmp.push_back(tmp_str);
+		}	
+		return Matrix(wight, length, tmp);
+	}
+
+	Matrix operator * (const Matrix& another) const
+	{
+		if(length != another.wight){
+			std::cout<< "Matrix has different sizes. Can't multiply." << std::endl;
+			return *this;
+		}
+		std::vector<std::vector<T>> tmp;
+		for (size_t i = 0; i < wight; i++)
+		{	
+			std::vector<T> tmp_str;
+			for (size_t j = 0; j < length; j++)
+			{
+				T sum = 0;
+				for (size_t k = 0; k<length; k++){
+					sum += Head[i][k] * another.Head[k][j];
+				}
+				tmp_str.push_back(sum);
+			}
+			tmp.push_back(tmp_str);
+		}	
+		return Matrix(wight, another.length, tmp);
+	}
+
+
 	Matrix(Matrix&& obj)
 	{
 		Head = obj.Head;
 		length = obj.length;
 		wight = obj.wight;
-		obj.Head = nullptr;
+		(obj.Head).clear();
 	} 
 
 
@@ -160,6 +202,12 @@ std::vector< std::vector <T> > Head;
 		}
 		if (wight = 2){
 			return Head[0][0]*Head[1][1] - Head[1][0]*Head[0][1];
+		}else{
+			T sum;
+			for (size_t i= 0; i < length; i++){
+				sum += std::pow(-1, i+2)*Head[0][i]*((Submatrix(1, i+1)).Det());
+			}
+			return sum;
 		}
 	}
 
