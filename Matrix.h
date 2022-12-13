@@ -154,6 +154,18 @@ T epsilon;
 		return Matrix(wight-1, length-1, Head_minor);
 	}
 
+	T Det()
+	{
+		//Защита от дурачка
+		if (wight != length){
+			std::cout << "This matrix doesn't have determinant" << std::endl;
+			return 0;
+		}
+		if (wight = 2){
+			return Head[0][0]*Head[1][1] - Head[1][0]*Head[0][1];
+		}
+	}
+
 
 	Matrix& make_one()
 	{
