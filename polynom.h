@@ -1,4 +1,3 @@
-
 class Polynom;	
 void ZeroCheck(std::complex<double> &number);
 std::complex<double> ValueInPoint(Polynom & pol, std::complex<double> point);
@@ -15,6 +14,8 @@ private:
 	template <typename T>
 	friend
 	void out_vector(std::vector<T>& vect);
+	friend
+	std::vector<Polynom> DivideTwoPolynom(const Polynom& divisible,const Polynom& divisor);
 public:
 	Polynom(){}
 
@@ -84,6 +85,9 @@ public:
 		}
 		return tmp;
 	}
+
+		
+	
 
 
 	std::complex<double> DerivativeInPoint(std::complex<double> point)
@@ -243,6 +247,55 @@ public:
 	}
 };
 
+std::vector<Polynom> DivideTwoPolynom(const Polynom& divisible,const Polynom& divisor)
+	{
+		int q = 0;
+		std::vector<Polynom> answer;
+		if (divisible.degree < divisor.degree) {
+			answer.push_back(Polynom(ComplexZero));
+			answer.push_back(divisible);
+			return answer;
+		}
+		std::vector<std::complex<double>> partial;
+		Polynom temp;
+		Polynom f_1 = divisible;
+		std::vector<std::complex<double>> temp_coefs;
+		std::cout<<f_1<<std::endl;
+		while(f_1.degree >= divisor.degree){
+			for (size_t i = 0; i < f_1.degree - divisor.degree; i++){
+				temp_coefs.push_back(ComplexZero);
+				std::cout<<"Pushing zeros to coefs";
+			}
+			std::cout << std::complex<double>(-1,0)*f_1.coefs[f_1.degree]/divisor.coefs[divisor.degree] << "<----- try to push it";
+			temp_coefs.push_back(std::complex<double>(-1,0)*f_1.coefs[f_1.degree]/divisor.coefs[divisor.degree]);
+			out_vector<std::complex<double>>(temp_coefs);
+			std::cout<< "<----- temp coefs" << std::endl;
+			temp.coefs = temp_coefs;
+			temp.degree = temp_coefs.size()-1;
+			std::cout<<f_1 << std::endl;
+			std::cout<< temp*divisor << std::endl;
+			f_1 = f_1 + temp*divisor;
+			std::cout<<f_1<<std::endl;
+			partial.push_back(temp.coefs[temp.degree]);
+			++q;
+			std::cout<<f_1.degree << "<------ this is degree";
+			//std::cout<<q<< "    "<< f_1 <<  std::endl << f_1.degree << std::endl;
+			for(size_t i = 0; i < temp_coefs.size(); ++i)
+			{
+				auto q = temp_coefs.end();
+				temp_coefs.erase(q-1);
+			}
+		}
+		std::cout<<"A";
+		std::reverse(partial.begin(), partial.end());
+		std::cout<< "B";
+		Polynom Partial(partial);
+		Polynom r = divisible + (Polynom(std::complex<double>(-1,0))*Partial * divisor);
+		answer.push_back(Partial);
+		answer.push_back(r);
+		return answer;
+	}
+
 void ZeroCheck(std::complex<double> &number)
 {
 	if(std::abs(number.real()) < epsilon)
@@ -280,3 +333,4 @@ void out_vector(std::vector<T>& vect)
 	std::cout<< std::endl;
 	return;
 }
+
