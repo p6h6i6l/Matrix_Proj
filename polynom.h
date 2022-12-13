@@ -15,6 +15,8 @@ private:
 	template <typename T>
 	friend
 	void out_vector(std::vector<T>& vect);
+	friend
+	std::vector<Polynom> DivideTwoPolynom(const Polynom& divisible,const Polynom& divisor);
 public:
 	Polynom(){}
 
@@ -61,7 +63,11 @@ public:
 			auto q = tmp.end();
 			tmp.erase(q-1);
 		}
-
+		if(tmp.size() == 0 )
+		{
+			Polynom q(ComplexZero);
+			return q;
+		}
 		Polynom q(tmp);
 		return q;
 	}
@@ -84,6 +90,9 @@ public:
 		}
 		return tmp;
 	}
+
+		
+	
 
 
 	std::complex<double> DerivativeInPoint(std::complex<double> point)
@@ -242,6 +251,33 @@ public:
 		std::cout<<std::endl;
 	}
 };
+
+std::vector<Polynom> DivideTwoPolynom(const Polynom& divisible,const Polynom& divisor)
+	{
+		int q = 0;
+		std::vector<std::complex<double>> partial;
+		std::vector<Polynom> answer;
+		Polynom temp;
+		Polynom f_1 = divisible;
+		std::vector<std::complex<double>> temp_coefs;
+		while(f_1.degree >= divisor.degree){
+			for (size_t i = 0; i < f_1.degree - divisor.degree; i++){
+				temp_coefs.push_back(ComplexZero);
+			}
+			temp_coefs.push_back(std::complex<double>(-1,0)*f_1.coefs[f_1.degree]/divisor.coefs[divisor.degree]);
+			Polynom temp(temp_coefs);
+			f_1 = f_1 + temp*divisor;
+			partial.push_back(temp.coefs[temp.degree]);
+			++q;
+			temp_coefs.clear();
+		}
+		std::reverse(partial.begin(), partial.end());
+		Polynom Partial(partial);
+		Polynom r = divisible + (Polynom(std::complex<double>(-1,0))*Partial * divisor);
+		answer.push_back(Partial);
+		answer.push_back(r);
+		return answer;
+	}
 
 void ZeroCheck(std::complex<double> &number)
 {
