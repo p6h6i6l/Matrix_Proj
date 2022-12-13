@@ -5,14 +5,14 @@ class Matrix
 public: 
 size_t length; 
 size_t wight;
-T** Head;
-double epsilon;
+std::vector< std::vector <T> > Head;
+T epsilon;
 
 	Matrix()
 	{
 		length = 0;
 		wight = 0;
-		Head = nullptr;
+		std::vector< std::vector<T> > Head;
 	}
 
 	Matrix(size_t wight_, size_t length_)
@@ -20,19 +20,28 @@ double epsilon;
 		epsilon = 0.0001;
 		std::random_device r;
  		std::default_random_engine e1(r());
-		std::uniform_int_distribution<int> uniform_dist(0, 100);
+		std::uniform_int_distribution<int> uniform_dist(0, 1);
+
 		length = length_;
 		wight = wight_;
-		Head = new T*[wight];
+		std::vector<T> str;
 		for (size_t i =0; i < wight; i++)
-		{
-			Head[i] = new T[length];
+		{	
 			for(size_t k = 0; k < length; k++)
-			{
-				Head[i][k] = uniform_dist(e1);
-				//Head[i][k] = 2;
+			{	
+				str.push_back(uniform_dist(e1));
 			}
+			Head.push_back(str);
+			str.clear();
 		}
+	}
+
+	Matrix(size_t wight_, size_t length_, std::vector< std::vector<T> > pool)
+	{
+		epsilon = 0.0001;
+		length = length_;
+		wight = wight_;
+		Head = pool;
 	}
 
 
@@ -40,10 +49,9 @@ double epsilon;
 	{
 		length = another.length;
 		wight = another.wight;
-		Head = new T*[wight];
+		std::vector< std::vector<T> > Head;
 		for (size_t i = 0; i < wight; i++)
 		{
-			Head[i] = new T[length];
 			for (size_t j = 0; j < length; j++)
 			{
 				Head[i][j] = another.Head[i][j];
@@ -84,7 +92,7 @@ double epsilon;
 
 	Matrix& swap_lines (size_t first, size_t second)
 	{
-		T* tmp;
+		std::vector<T>tmp;
 		tmp = Head[first];
 		Head[first] = Head[second];
 		Head[second] = tmp;
@@ -133,6 +141,19 @@ double epsilon;
 		return *this;
 	}
 
+	Matrix Submatrix(size_t line, size_t column)
+	{
+		std::vector< std::vector<T> > Head_minor = Head;
+		auto begin = Head_minor.cbegin();
+		Head_minor.erase(begin + line - 1);
+		for (size_t i = 0; i<length-1; i++)
+		{
+			auto begin1 = Head_minor[i].cbegin();
+			Head_minor[i].erase(begin1 + column - 1);
+		}
+		return Matrix(wight-1, length-1, Head_minor);
+	}
+
 
 	Matrix& make_one()
 	{
@@ -170,24 +191,24 @@ double epsilon;
 	}
 
 
-	Matrix& to_down_tringled(Matrix& b)
+	Matrix& ToUpTringled(Matrix& b)
 	{
 		size_t a = 0;
 		for(size_t i = 0; i < length; i++)
 		{
 			for(int j = 0 ; j < wight; j++)
 			{
-				if(abs(Head[j][i]) > epsilon and j >=a)
+				if(std::abs(Head[j][i]) > epsilon and j >=a)
 				{
 					swap_lines(a,j);
 					b.swap_lines(a,j);
-					b.multiply_by_constant(1/(Head[a][i]), a);
-					multiply_by_constant(1/(Head[a][i]), a);
+					b.multiply_by_constant(T(1)/(Head[a][i]), a);
+					multiply_by_constant(T(1)/(Head[a][i]), a);
 					for(size_t k = a+1; k < wight; k++)
 					{
 						b.sum_multiplied_first_to_second(a,k, -Head[k][i]);
 						sum_multiplied_first_to_second(a,k, -Head[k][i]);
-						//out_matrix();
+						out_matrix();
 					}
 					a++;
 					break;
@@ -198,19 +219,19 @@ double epsilon;
 	}
 
 
-	Matrix& to_led(Matrix &b)
+	Matrix& ToLed(Matrix &b)
 	{
-		for(size_t i = wight-1; i+1 > 0; i--)
+		for(size_t i = wight - 1; i+1 > 0; i--)
 			{
 				for (size_t j = 0; j < length; j++)
 				{
-					if(abs(Head[i][j] > epsilon ))
+					if(std::abs(Head[i][j] > epsilon ))
 					{
 						for (size_t k = i-1; k+1 >0; k--)
 						{
 							b.sum_multiplied_first_to_second(i,k, -Head[k][j]);
 							sum_multiplied_first_to_second(i,k, -Head[k][j]);
-							//out_matrix();
+							out_matrix();
 						}
 						break;
 					}
@@ -220,21 +241,29 @@ double epsilon;
 		return *this;
 	}
 
-
-	~Matrix()
-	{
-		if(wight == 0)
-			return;
-		for (int i = 0; i < wight; i++)
+	/*Matrix& GaussMethod(Matrix &b){
+		ToUpTringled(b);
+		ToLed(b);
+		int flag = 0;
+		for (size_t i = wight-1; i+1>0; i--)
 		{
-			delete[] Head[i];
+			if ( std::abs(b.Head[i][0]) < epsilon){
+				for (size_t j = 0; j < length; j++){
+					if (std::abs(Head[i][j]) > epsilon){flag++;}
+				}
+			}
 		}
+		if (flag != 0){
+			std::cout<<"can't be solved :(";
+		}else{
+			for  (size_t i =0; i<wight; i++){
+				std::cout<< b.Head[i][0] << std::endl;
+			}
+		}
+		return *this;
+	}*/
 
-		if(Head	!= nullptr)
-		{
-			delete[] Head;
-		}
-	}
+	~Matrix(){}
 	
 
 };
