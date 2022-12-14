@@ -56,6 +56,8 @@ int main(int argc, char const *argv[])
     Polynom q4(v7);
     Polynom q5(v8);
     std::vector<Polynom> tmp1 = DivideTwoPolynom(q4,q5);
+    Polynom tmp2 = q4/q5;
+    std::cout<<tmp2;
     out_vector<Polynom>(tmp1);
 	return 0;
 }

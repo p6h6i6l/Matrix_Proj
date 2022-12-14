@@ -110,6 +110,12 @@ public:
 		return (*this + Polynom(-1)*another);
 	}
 
+	Polynom operator / (const Polynom& another){
+		std::vector<Polynom> tmp = DivideTwoPolynom(*this, another);
+
+		return tmp[0];
+	}
+
 
 	std::complex<double> DerivativeInPoint(std::complex<double> point)
 	{
