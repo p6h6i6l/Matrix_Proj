@@ -18,7 +18,7 @@ std::vector< std::vector <T> > Head;
 	{
 		std::random_device r;
  		std::default_random_engine e1(r());
-		std::uniform_int_distribution<int> uniform_dist(0, 100);
+		std::uniform_int_distribution<int> uniform_dist(0, 1);
 
 		length = length_;
 		wight = wight_;
@@ -130,7 +130,7 @@ std::vector< std::vector <T> > Head;
 	}
 
 
-	Matrix& swap_lines (size_t first, size_t second)
+	Matrix& SwapLines (size_t first, size_t second)
 	{
 		std::vector<T>tmp;
 		tmp = Head[first];
@@ -140,7 +140,7 @@ std::vector< std::vector <T> > Head;
 	}
 
 
-	Matrix& swap_columns (size_t first, size_t second)
+	Matrix& SwapColumns (size_t first, size_t second)
 	{
 		for (int i = 0; i < wight; i++)
 		{
@@ -150,7 +150,7 @@ std::vector< std::vector <T> > Head;
 	}
 
 
-	Matrix& sum_first_to_second (size_t first, size_t second)
+	Matrix& SumFirstToSecond (size_t first, size_t second)
 	{
 		for (int i = 0; i < wight; i++)
 		{
@@ -160,7 +160,7 @@ std::vector< std::vector <T> > Head;
 	}
 
 
-	Matrix& multiply_by_constant (T constant, size_t line)
+	Matrix& MultiplyByConstant (T constant, size_t line)
 	{
 		for (int i = 0; i < length; i++)
 		{
@@ -170,7 +170,7 @@ std::vector< std::vector <T> > Head;
 	}
 
 
-	Matrix& sum_multiplied_first_to_second(size_t first, size_t second, T constant)
+	Matrix& SunMultipledFirstToSecond(size_t first, size_t second, T constant)
 	{
 		T t[length];
 		for (int i = 0 ; i < length; i++)
@@ -216,20 +216,6 @@ std::vector< std::vector <T> > Head;
 		}
 	}
 
-	void out_matrix()
-	{
-		for(size_t i = 0; i < wight; i++)
-		{
-			for( size_t j = 0 ; j < length; j++)
-			{
-				std::cout<< Head[i][j] << "      ";
-			}
-			std::cout << std::endl;
-		}
-		std::cout<<std::endl;
-		return;
-	}
-
 
 	Matrix& ToUpTringled(Matrix& b)
 	{
@@ -240,15 +226,15 @@ std::vector< std::vector <T> > Head;
 			{
 				if(std::abs(Head[j][i]) > epsilon and j >=a)
 				{
-					swap_lines(a,j);
-					b.swap_lines(a,j);
-					b.multiply_by_constant(T(1)/(Head[a][i]), a);
-					multiply_by_constant(T(1)/(Head[a][i]), a);
+					SwapLines(a,j);
+					b.SwapLines(a,j);
+					b.MultiplyByConstant(T(1)/(Head[a][i]), a);
+					MultiplyByConstant(T(1)/(Head[a][i]), a);
 					for(size_t k = a+1; k < wight; k++)
 					{
-						b.sum_multiplied_first_to_second(a,k, -Head[k][i]);
-						sum_multiplied_first_to_second(a,k, -Head[k][i]);
-						out_matrix();
+						b.SunMultipledFirstToSecond(a,k, -Head[k][i]);
+						SunMultipledFirstToSecond(a,k, -Head[k][i]);
+						std::cout << *this;
 					}
 					a++;
 					break;
@@ -269,9 +255,9 @@ std::vector< std::vector <T> > Head;
 					{
 						for (size_t k = i-1; k+1 >0; k--)
 						{
-							b.sum_multiplied_first_to_second(i,k, -Head[k][j]);
-							sum_multiplied_first_to_second(i,k, -Head[k][j]);
-							out_matrix();
+							b.SunMultipledFirstToSecond(i,k, -Head[k][j]);
+							SunMultipledFirstToSecond(i,k, -Head[k][j]);
+							std::cout<<*this;
 						}
 						break;
 					}
@@ -292,7 +278,7 @@ std::vector< std::vector <T> > Head;
 		{
 			if (std::abs(Head[count][count])<epsilon and (count + swap_column)<length )
 			{
-				swap_columns(count+1, count + swap_column+1);
+				SwapColumns(count+1, count + swap_column+1);
 				std::cout<<"Swapped column " << count << "and column " << count + swap_column <<std::endl;
 				swap_column+=1;
 			}else{
@@ -304,7 +290,7 @@ std::vector< std::vector <T> > Head;
 		ToLed(b);
 
 		//Выписываем ФСР 
-		std::cout<<"ФСР: " << std::endl;
+		std::cout<<"FSS: " << std::endl;
 		size_t t = 0;
 		std::vector<std::vector<T>> FSS;
 		while(t<wight and Head[t][t] != 0){t++;} 
@@ -324,8 +310,8 @@ std::vector< std::vector <T> > Head;
 			}
 			FSS.push_back(FSS_str);
 		}
-		(Matrix(length, length-t, FSS)).out_matrix();
-		std::cout<<"ФСР все " << std::endl;
+		std::cout<<Matrix(length, length-t, FSS);
+		std::cout<<"FSS all:" << std::endl;
 
 		//Проверка на совместность СЛУ
 		/*int flag = 0;
@@ -373,3 +359,18 @@ Matrix<Polynom> ToCharPolynom( Matrix<T>& b){
 		}
 		return Matrix<Polynom>(b.wight, b.length, Head_polynom);
 	}
+
+template <typename T>
+std::ostream& operator<<(std::ostream &os, const Matrix<T>& M)
+{
+	for(size_t i = 0; i < M.wight; ++i)
+	{
+		for(size_t j = 0; j < M.length; ++j)
+		{
+			os<< M.Head[i][j] << "     ";
+		}
+		os<<std::endl;
+	}
+	os<<std::endl;
+	return os;
+}
