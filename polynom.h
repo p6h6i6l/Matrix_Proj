@@ -289,8 +289,8 @@ std::vector<Polynom> DivideTwoPolynom(const Polynom& divisible,const Polynom& di
 		}
 		std::reverse(partial.begin(), partial.end());
 		Polynom Partial(partial);
-		Polynom r = divisible + (Polynom(std::complex<double>(-1,0))*Partial * divisor);
-		answer.push_back(Partial);
+		Polynom r = divisible + (Partial * divisor);
+		answer.push_back(Polynom(std::complex<double>(-1,0))*Partial);
 		answer.push_back(r);
 		return answer;
 	}
