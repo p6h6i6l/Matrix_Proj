@@ -1,4 +1,4 @@
-
+using namespace std;
 template <typename T>
 class Matrix
 {
@@ -9,10 +9,11 @@ std::vector< std::vector <T> > Head;
 
 	Matrix()
 	{
-		length = 0;
-		wight = 0;
-		T tmp = T(0);
-		Head.push_back(tmp);
+		length = 1;
+		wight = 1;
+		std::vector<T> a;
+		a.push_back(T(0));
+		Head.push_back(a);
 	}
 
 
@@ -259,8 +260,8 @@ std::vector< std::vector <T> > Head;
 					MultiplyByConstant(T(1)/(Head[a][i]), a);
 					for(size_t k = a+1; k < wight; k++)
 					{
-						b.SunMultipledFirstToSecond(a,k, -Head[k][i]);
-						SunMultipledFirstToSecond(a,k, -Head[k][i]);
+						b.SunMultipledFirstToSecond(a,k, T(-1)*Head[k][i]);
+						SunMultipledFirstToSecond(a,k, T(-1)*Head[k][i]);
 						std::cout << *this;
 					}
 					a++;
@@ -278,12 +279,12 @@ std::vector< std::vector <T> > Head;
 			{
 				for (size_t j = 0; j < length; j++)
 				{
-					if(std::abs(Head[i][j] > epsilon ))
+					if(std::abs(Head[i][j]) > epsilon )
 					{
 						for (size_t k = i-1; k+1 >0; k--)
 						{
-							b.SunMultipledFirstToSecond(i,k, -Head[k][j]);
-							SunMultipledFirstToSecond(i,k, -Head[k][j]);
+							b.SunMultipledFirstToSecond(i,k, T(-1)*Head[k][j]);
+							SunMultipledFirstToSecond(i,k, T(-1)*Head[k][j]);
 							std::cout<<*this;
 						}
 						break;
@@ -321,14 +322,14 @@ std::vector< std::vector <T> > Head;
 		std::cout<<"FSS: " << std::endl;
 		size_t t = 0;
 		std::vector<std::vector<T>> FSS;
-		while(t<wight and Head[t][t] != 0){t++;} 
+		while(t<wight and std::abs(Head[t][t]) > epsilon)	{t++;} 
 		for (size_t i = 0; i<length; i++)
 		{
 			std::vector<T> FSS_str;
 			if(i<t){
 				for(size_t j = t; j < length; j++)
 				{
-					FSS_str.push_back(-Head[i][j]);
+					FSS_str.push_back(T(-1)*Head[i][j]);
 				}
 			}else{
 				for(size_t j = t; j < length; j++)
