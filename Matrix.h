@@ -11,8 +11,9 @@ std::vector< std::vector <T> > Head;
 	{
 		length = 1;
 		wight = 1;
+		T tmp = T(0);
 		std::vector<T> a;
-		a.push_back(T(0));
+		a.push_back(tmp);
 		Head.push_back(a);
 	}
 
@@ -30,7 +31,7 @@ std::vector< std::vector <T> > Head;
 		{	
 			for(size_t k = 0; k < length; k++)
 			{	
-				str.push_back(uniform_dist(e1));
+				str.push_back(T(uniform_dist(e1), uniform_dist(e1)));
 			}
 			Head.push_back(str);
 			str.clear();
@@ -303,13 +304,19 @@ std::vector< std::vector <T> > Head;
 		//Перестановка столбцов:
 		int count = 0;
 		int swap_column = 1;
+		std::vector<std::vector<size_t>> swap;
 		while (count < wight)
 		{
 			if (std::abs(Head[count][count])<epsilon and (count + swap_column)<length )
 			{
 				SwapColumns(count+1, count + swap_column+1);
+				std::vector<size_t> transposition;
+				transposition.push_back(count);
+				transposition.push_back(count + swap_column);
+				swap.push_back(transposition);
 				std::cout<<"Swapped column " << count << "and column " << count + swap_column <<std::endl;
 				swap_column+=1;
+				transposition.clear();
 			}else{
 				count++;
 				swap_column = 1;
@@ -339,7 +346,16 @@ std::vector< std::vector <T> > Head;
 			}
 			FSS.push_back(FSS_str);
 		}
-		std::cout<<Matrix(length, length-t, FSS);
+		Matrix FSS_matrix = Matrix(length, length-t, FSS);
+		std::cout<< FSS_matrix;
+		for (size_t i = 0; i<swap.size(); i++)
+		{
+			std::cout << "good1"<<std::endl;
+			FSS_matrix.SwapLines(swap[i][0], swap[i][1]);
+			std::cout << "good2"<<std::endl;
+		}
+
+		std::cout<< FSS_matrix;
 		std::cout<<"FSS all:" << std::endl;
 
 		//Проверка на совместность СЛУ
