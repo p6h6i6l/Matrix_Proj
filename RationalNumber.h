@@ -6,20 +6,21 @@ class Rational
 {
 private:
 	long long numerator;
-	unsigned long long denumerator;
+	long long denumerator;
 	friend std::ostream& operator<<(std::ostream &os, const Rational& r);
 	friend double abs(const Rational& obj);
 public:
 
-	void out()
-	{
-		std::cout<< numerator << std::endl << denumerator << std::endl;
-	}
-
 
 	void divide()
 	{
-		long long gcd_a_b = gcd(abs(numerator), abs(denumerator));
+		if(numerator == 0)
+		{
+			denumerator = 1;
+			return;
+		}
+
+		long long gcd_a_b = gcd(std::abs(numerator), std::abs(denumerator));
 		if( gcd != 0 )
 		{
 			numerator = numerator / gcd_a_b;
@@ -41,21 +42,35 @@ public:
 	{
 		try
 		{
-			if( denumerator_ <= 0)
+			if( denumerator_ == 0)
 			{
 				numerator = 1;
 				denumerator = 1;
 				throw 0;
 			}
-			numerator = numerator_;
-			denumerator = denumerator_;
-			divide();
+			if(denumerator_ < 0 )
+			{
+				//std::cout << "Yes";
+				numerator = -numerator_;
+				denumerator = -denumerator_;
+				divide();
+				return;
+			}
+			else
+			{
+				numerator = numerator_;
+				denumerator = denumerator_;
+				divide();
+				return;
+			}
 		}
 
 		catch(int a)
 		{	
-			if(a == 0)
-				std::cerr << "denumerator must be more than zero, your number is 1/1"<< std::endl;
+			if(a == 0) 
+			{
+				std::cerr << "denumerator must be non zero, your number is 1/1"<< std::endl;
+			}
 		}
 	}
 
@@ -103,7 +118,7 @@ public:
 		return tmp;
 	}
 
-	bool operator < (const Rational& another)
+	/*bool operator < (const Rational& another)
 	{
 		Rational tmp(*this - another);
 		if(tmp.numerator < 0 )
@@ -128,7 +143,7 @@ public:
 			return true;
 		else
 			return false;
-	}
+	}*/
 
 
 	~Rational()
@@ -153,5 +168,7 @@ std::ostream& operator<<(std::ostream &os, const Rational& r)
 
 double abs(const Rational& obj)
 {
-	return abs(obj.numerator / obj.denumerator);
+	double tmp1(obj.numerator);
+	double tmp2(obj.denumerator);
+	return std::abs(tmp1/tmp2);
 }
