@@ -18,13 +18,24 @@ private:
 	friend
 	std::vector<Polynom> DivideTwoPolynom(const Polynom& divisible,const Polynom& divisor);
 public:
-	Polynom(){}
+	Polynom()
+	{
+		degree = 0;
+		coefs.push_back(ComplexZero);
+	}
 
 	Polynom(std::complex<double> a)
 	{
 		degree = 0;
 		coefs.push_back(a);
 	}
+
+	Polynom(long long a)
+	{
+		degree = 0;
+		coefs.push_back(std::complex<double>(a,0));
+	}
+
 	Polynom(std::vector<std::complex<double>>& coefs_, size_t degree_)
 	{
 		coefs = coefs_;
@@ -72,6 +83,8 @@ public:
 		return q;
 	}
 
+
+
 	Polynom operator * (const Polynom& another)
 	{
 		std::complex<double> sum = ComplexZero;
@@ -92,7 +105,10 @@ public:
 	}
 
 		
-	
+	Polynom operator - (const Polynom& another)
+	{
+		return (*this + Polynom(-1)*another);
+	}
 
 
 	std::complex<double> DerivativeInPoint(std::complex<double> point)
@@ -194,7 +210,7 @@ public:
 
 	}
 
-	std::complex<double> FindMaxRoot(std::vector<std::complex<double>>& roots)
+	/*std::complex<double> FindMaxRoot(std::vector<std::complex<double>>& roots)
 	{
 		size_t max_index = 0;
 		for(int i = 0; i < roots.size(); ++i)
@@ -203,7 +219,7 @@ public:
 				max_index = i;
 		}
 		return roots[max_index];
-	}
+	}*/
 
 	bool CheckNumberLikeARoot(std::complex<double> root)
 	{
@@ -316,3 +332,5 @@ void out_vector(std::vector<T>& vect)
 	std::cout<< std::endl;
 	return;
 }
+
+
