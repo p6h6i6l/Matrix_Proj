@@ -142,9 +142,9 @@ std::vector< std::vector <T> > Head;
 
 	Matrix& swap_columns (size_t first, size_t second)
 	{
-		for (int i = 0; i < length; i++)
+		for (int i = 0; i < wight; i++)
 		{
-			std::swap(Head[i][first],Head[i][second]);
+			std::swap(Head[i][first-1],Head[i][second-1]);
 		}
 		return *this;
 	}
@@ -281,10 +281,54 @@ std::vector< std::vector <T> > Head;
 		return *this;
 	}
 
-	/*Matrix& GaussMethod(Matrix &b){
+	Matrix& GaussMethod(Matrix &b){
+		//Приведение к почти верхнетреугольному виду
 		ToUpTringled(b);
+
+		//Перестановка столбцов:
+		int count = 0;
+		int swap_column = 1;
+		while (count < wight)
+		{
+			if (std::abs(Head[count][count])<epsilon and (count + swap_column)<length )
+			{
+				swap_columns(count+1, count + swap_column+1);
+				std::cout<<"Swapped column " << count << "and column " << count + swap_column <<std::endl;
+				swap_column+=1;
+			}else{
+				count++;
+				swap_column = 1;
+			}
+		}
+		//Приведение к единичному виду
 		ToLed(b);
-		int flag = 0;
+
+		//Выписываем ФСР 
+		std::cout<<"ФСР: " << std::endl;
+		size_t t = 0;
+		std::vector<std::vector<T>> FSS;
+		while(t<wight and Head[t][t] != 0){t++;} 
+		for (size_t i = 0; i<length; i++)
+		{
+			std::vector<T> FSS_str;
+			if(i<t){
+				for(size_t j = t; j < length; j++)
+				{
+					FSS_str.push_back(-Head[i][j]);
+				}
+			}else{
+				for(size_t j = t; j < length; j++)
+				{
+					FSS_str.push_back(T((i==j)));
+				}
+			}
+			FSS.push_back(FSS_str);
+		}
+		(Matrix(length, length-t, FSS)).out_matrix();
+		std::cout<<"ФСР все " << std::endl;
+
+		//Проверка на совместность СЛУ
+		/*int flag = 0;
 		for (size_t i = wight-1; i+1>0; i--)
 		{
 			if ( std::abs(b.Head[i][0]) < epsilon){
@@ -299,9 +343,9 @@ std::vector< std::vector <T> > Head;
 			for  (size_t i =0; i<wight; i++){
 				std::cout<< b.Head[i][0] << std::endl;
 			}
-		}
+		}*/
 		return *this;
-	}*/
+	}
 
 	~Matrix(){}
 	
