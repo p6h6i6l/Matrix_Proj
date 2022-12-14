@@ -8,6 +8,7 @@ private:
 	long long numerator;
 	unsigned long long denumerator;
 	friend std::ostream& operator<<(std::ostream &os, const Rational& r);
+	friend double abs(const Rational& obj);
 public:
 
 	void out()
@@ -58,7 +59,7 @@ public:
 		}
 	}
 
-	Rational(const Rational & another):numerator(another.numerator), denumerator(another.denumerator)
+	Rational(const Rational& another):numerator(another.numerator), denumerator(another.denumerator)
 	{
 		divide();
 	}
@@ -94,6 +95,42 @@ public:
 		return tmp;
 	}
 
+	Rational operator - (const Rational& another)
+	{
+		Rational tmp(numerator*another.denumerator - another.numerator*denumerator, 
+			denumerator*another.denumerator);
+
+		return tmp;
+	}
+
+	bool operator < (const Rational& another)
+	{
+		Rational tmp(*this - another);
+		if(tmp.numerator < 0 )
+			return true;
+		else
+			return false;
+	}
+
+	bool operator == (const Rational& another)
+	{
+		return(numerator == another.numerator && denumerator == another.denumerator);
+	}
+
+	bool operator >= (const Rational& another)
+	{
+		return (!(*this< another));
+	}
+	bool operator > (const Rational& another)
+	{
+		Rational tmp(*this - another);
+		if(tmp.numerator > 0 )
+			return true;
+		else
+			return false;
+	}
+
+
 	~Rational()
 	{
 		return;
@@ -112,4 +149,9 @@ long long gcd( long long a,long long b)
 std::ostream& operator<<(std::ostream &os, const Rational& r)
 {
 	return os << r.numerator << "/" << r.denumerator;
+}
+
+double abs(const Rational& obj)
+{
+	return abs(obj.numerator / obj.denumerator);
 }
