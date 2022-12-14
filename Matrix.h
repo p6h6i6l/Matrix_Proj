@@ -22,7 +22,7 @@ std::vector< std::vector <T> > Head;
 	{
 		std::random_device r;
  		std::default_random_engine e1(r());
-		std::uniform_int_distribution<int> uniform_dist(0, 1);
+		std::uniform_int_distribution<int> uniform_dist(0, 5);
 
 		length = length_;
 		wight = wight_;
@@ -236,9 +236,9 @@ std::vector< std::vector <T> > Head;
 			T sum;
 			for (size_t i= 0; i < length; i++){
 				if ((i+2)%2 == 0){
-					sum += Head[0][i]*((Submatrix(1, i+1)).Det());
+					sum = sum + Head[0][i]*((Submatrix(1, i+1)).Det());
 				}else{
-					sum += -Head[0][i]*((Submatrix(1, i+1)).Det());
+					sum = sum -Head[0][i]*((Submatrix(1, i+1)).Det());
 				}
 			}
 			return sum;
@@ -401,7 +401,7 @@ Matrix<Polynom> ToCharPolynom( const Matrix<T>& b){
 			{
 				if (i==j)
 				{
-					std::vector<std::complex<T>> elem = {b.Head[i][j], -1};
+					std::vector<std::complex<double>> elem = {b.Head[i][j], -1};
 					polynom_str.push_back(Polynom(elem));
 				}else
 				{
