@@ -11,8 +11,10 @@ std::vector< std::vector <T> > Head;
 	{
 		length = 0;
 		wight = 0;
-		std::vector< std::vector<T> > Head;
+		T tmp = T(0);
+		Head.push_back(tmp);
 	}
+
 
 	Matrix(size_t wight_, size_t length_)
 	{
@@ -33,6 +35,7 @@ std::vector< std::vector <T> > Head;
 			str.clear();
 		}
 	}
+
 
 	Matrix(size_t wight_, size_t length_, std::vector< std::vector<T> > pool)
 	{
@@ -68,6 +71,7 @@ std::vector< std::vector <T> > Head;
 		return *this;
 	}
 
+
 	Matrix operator + (const Matrix& another) const
 	{
 		if(wight != another.wight || length != another.length){
@@ -86,6 +90,27 @@ std::vector< std::vector <T> > Head;
 		}	
 		return Matrix(wight, length, tmp);
 	}
+
+
+	Matrix operator - (const Matrix& another) const
+	{
+		if(wight != another.wight || length != another.length){
+			std::cout<< "Matrix has different sizes. Can't sum." << std::endl;
+			return *this;
+		}
+		std::vector<std::vector<T>> tmp;
+		for (size_t i = 0; i < wight; i++)
+		{	
+			std::vector<T> tmp_str;
+			for (size_t j = 0; j < length; j++)
+			{
+				tmp_str.push_back(Head[i][j] - another.Head[i][j]);
+			}
+			tmp.push_back(tmp_str);
+		}	
+		return Matrix(wight, length, tmp);
+	}
+
 
 	Matrix operator * (const Matrix& another) const
 	{
@@ -181,6 +206,7 @@ std::vector< std::vector <T> > Head;
 		return *this;
 	}
 
+
 	Matrix Submatrix(size_t line, size_t column)
 	{
 		std::vector< std::vector<T> > Head_minor = Head;
@@ -193,6 +219,7 @@ std::vector< std::vector <T> > Head;
 		}
 		return Matrix(wight-1, length-1, Head_minor);
 	}
+
 
 	T Det()
 	{
@@ -267,6 +294,7 @@ std::vector< std::vector <T> > Head;
 		return *this;
 	}
 
+
 	Matrix& GaussMethod(Matrix &b){
 		//Приведение к почти верхнетреугольному виду
 		ToUpTringled(b);
@@ -333,13 +361,21 @@ std::vector< std::vector <T> > Head;
 		return *this;
 	}
 
+
+	std::vector<Matrix<T>> ToJordanForm()
+	{
+		Matrix<Polynom> q = ToCharPolynom(*this);
+	}
+
+
 	~Matrix(){}
 	
 
 };
 
+
 template <typename T>
-Matrix<Polynom> ToCharPolynom( Matrix<T>& b){
+Matrix<Polynom> ToCharPolynom( const Matrix<T>& b){
 		std::vector< std::vector< Polynom > > Head_polynom;
 		for (size_t i = 0; i<b.wight; i++)
 		{
