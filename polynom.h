@@ -110,6 +110,12 @@ public:
 		return (*this + Polynom(-1)*another);
 	}
 
+	Polynom operator / (const Polynom& another){
+		std::vector<Polynom> tmp = DivideTwoPolynom(*this, another);
+
+		return tmp[0];
+	}
+
 
 	std::complex<double> DerivativeInPoint(std::complex<double> point)
 	{
@@ -289,8 +295,8 @@ std::vector<Polynom> DivideTwoPolynom(const Polynom& divisible,const Polynom& di
 		}
 		std::reverse(partial.begin(), partial.end());
 		Polynom Partial(partial);
-		Polynom r = divisible + (Polynom(std::complex<double>(-1,0))*Partial * divisor);
-		answer.push_back(Partial);
+		Polynom r = divisible + (Partial * divisor);
+		answer.push_back(Polynom(std::complex<double>(-1,0))*Partial);
 		answer.push_back(r);
 		return answer;
 	}
@@ -331,6 +337,30 @@ void out_vector(std::vector<T>& vect)
 		std::cout<< vect[i]<<std::endl;
 	std::cout<< std::endl;
 	return;
+}
+
+std::vector<std::vector<std::complex<double>>> multiplicity(const std::vector<std::complex<double>>& roots)
+{
+	std::vector<std::complex<double>> roots_copy = roots;
+	std::vector<std::vector<std::complex<double>>> mult;
+	for (size_t i = 0; i<roots_copy.size(); i++)
+	{
+		size_t count = 1;
+		std::vector<std::complex<double>> str = {roots_copy[i], std::complex<double>(count)};
+		for (size_t j = i+1; j-count+1<roots_copy.size(); j++)
+		{ 
+			if (std::abs(roots_copy[i] - roots_copy[j-count+1])<0.1)
+			{
+				auto begin = roots_copy.cbegin();
+				roots_copy.erase(begin+j-count+1);
+				count+=1;
+				str[1] +=1;
+			}
+		}
+		mult.push_back(str);
+		str.clear();
+	}
+	return mult;
 }
 
 

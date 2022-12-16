@@ -408,6 +408,35 @@ std::vector< std::vector <T> > Head;
 		{
 			std::cerr <<"Wrong size. Error code 2" << std::endl;
 		}
+
+		std::cout<< FSS_matrix;
+		std::cout<<"FSS all:" << std::endl;
+
+		//Проверка на совместность СЛУ и вывод частного решения
+		std::cout<< "Partial solution: " << std::endl;
+		t = 0;
+		size_t flag = 0;
+		while(t < wight and std::abs(Head[t][t]) > epsilon){t++;}
+		for (size_t i = t; t<wight; t++){
+			if (abs(b.Head[t][0])>epsilon){
+				std::cout<< "System can't be solved :(" << std::endl;
+				flag = 1;
+				t = wight;
+			}
+		}
+		if (flag == 0){
+			std::vector<std::vector<T>> new_b_Head;
+			for (size_t j = 0; j<length; j++)
+			{
+				if(j<t){
+					(new_b_Head).push_back({b.Head[j][0]});
+				}else{
+					(new_b_Head).push_back({0});
+				}
+			}
+			std::cout<< Matrix(length, 1, new_b_Head);
+		}
+		return *this;
 	}
 
 
