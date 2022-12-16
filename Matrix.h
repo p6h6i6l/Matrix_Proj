@@ -1,6 +1,6 @@
 using namespace std;
 template <typename T>
-class Matrix
+class Matrix final 
 {
 public: 
 size_t length; 
@@ -22,7 +22,7 @@ std::vector< std::vector <T> > Head;
 	{
 		std::random_device r;
  		std::default_random_engine e1(r());
-		std::uniform_int_distribution<int> uniform_dist(0, 5);
+		std::uniform_int_distribution<int> uniform_dist(0, 7);
 
 		length = length_;
 		wight = wight_;
@@ -76,65 +76,84 @@ std::vector< std::vector <T> > Head;
 
 	Matrix operator + (const Matrix& another) const
 	{
-		if(wight != another.wight || length != another.length){
-			std::cout<< "Matrix has different sizes. Can't sum." << std::endl;
-			return *this;
-		}
-		std::vector<std::vector<T>> tmp;
-		for (size_t i = 0; i < wight; i++)
-		{	
-			std::vector<T> tmp_str;
-			for (size_t j = 0; j < length; j++)
-			{
-				tmp_str.push_back(Head[i][j] + another.Head[i][j]);
+		try
+		{
+			if(wight != another.wight || length != another.length){
+				std::cout<< "Matrix has different sizes. Can't sum." << std::endl;
+				throw 2;
 			}
-			tmp.push_back(tmp_str);
-		}	
-		return Matrix(wight, length, tmp);
+			std::vector<std::vector<T>> tmp;
+			for (size_t i = 0; i < wight; i++)
+			{	
+				std::vector<T> tmp_str;
+				for (size_t j = 0; j < length; j++)
+				{
+					tmp_str.push_back(Head[i][j] + another.Head[i][j]);
+				}
+				tmp.push_back(tmp_str);
+			}	
+			return Matrix(wight, length, tmp);
+		}
+		catch(size_t)
+		{
+			std::cerr <<"Wrong size. Error code 2" << std::endl;
+		}
 	}
 
 
 	Matrix operator - (const Matrix& another) const
 	{
-		if(wight != another.wight || length != another.length){
-			std::cout<< "Matrix has different sizes. Can't sum." << std::endl;
-			return *this;
-		}
-		std::vector<std::vector<T>> tmp;
-		for (size_t i = 0; i < wight; i++)
-		{	
-			std::vector<T> tmp_str;
-			for (size_t j = 0; j < length; j++)
-			{
-				tmp_str.push_back(Head[i][j] - another.Head[i][j]);
+		try
+		{
+			if(wight != another.wight || length != another.length){
+				throw 2;
+				return *this;
 			}
-			tmp.push_back(tmp_str);
-		}	
-		return Matrix(wight, length, tmp);
+			std::vector<std::vector<T>> tmp;
+			for (size_t i = 0; i < wight; i++)
+			{	
+				std::vector<T> tmp_str;
+				for (size_t j = 0; j < length; j++)
+				{
+					tmp_str.push_back(Head[i][j] - another.Head[i][j]);
+				}
+				tmp.push_back(tmp_str);
+			}	
+			return Matrix(wight, length, tmp);
+		}
+		catch(size_t a)
+		{
+			std::cerr <<"Wrong size. Error code 2" << std::endl;
+		}
 	}
 
 
 	Matrix operator * (const Matrix& another) const
 	{
-		if(length != another.wight){
-			std::cout<< "Matrix has different sizes. Can't multiply." << std::endl;
-			return *this;
-		}
-		std::vector<std::vector<T>> tmp;
-		for (size_t i = 0; i < wight; i++)
-		{	
-			std::vector<T> tmp_str;
-			for (size_t j = 0; j < length; j++)
-			{
-				T sum = 0;
-				for (size_t k = 0; k<length; k++){
-					sum += Head[i][k] * another.Head[k][j];
+		try
+		{
+			if(length != another.wight)
+				throw 2;
+			std::vector<std::vector<T>> tmp;
+			for (size_t i = 0; i < wight; i++)
+			{	
+				std::vector<T> tmp_str;
+				for (size_t j = 0; j < length; j++)
+				{
+					T sum = 0;
+					for (size_t k = 0; k<length; k++){
+						sum += Head[i][k] * another.Head[k][j];
+					}
+					tmp_str.push_back(sum);
 				}
-				tmp_str.push_back(sum);
-			}
-			tmp.push_back(tmp_str);
-		}	
-		return Matrix(wight, another.length, tmp);
+				tmp.push_back(tmp_str);
+			}	
+			return Matrix(wight, another.length, tmp);
+		}
+		catch(size_t)
+		{
+			std::cerr <<"Wrong size. Error code 2" << std::endl;
+		}
 	}
 
 
@@ -225,23 +244,28 @@ std::vector< std::vector <T> > Head;
 
 	T Det()
 	{
+		try{
 		//Защита от дурачка
 		if (wight != length){
-			std::cout << "This matrix doesn't have determinant" << std::endl;
-			std::exit(0);
+			throw 0;
 		}
-		if (wight == 2){
-			return Head[0][0]*Head[1][1] - Head[1][0]*Head[0][1];
-		}else{
-			T sum;
-			for (size_t i= 0; i < length; i++){
-				if ((i+2)%2 == 0){
-					sum = sum + Head[0][i]*((Submatrix(1, i+1)).Det());
-				}else{
-					sum = sum -Head[0][i]*((Submatrix(1, i+1)).Det());
+			if (wight == 2){
+				return Head[0][0]*Head[1][1] - Head[1][0]*Head[0][1];
+			}else{
+				T sum;
+				for (size_t i= 0; i < length; i++){
+					if ((i+2)%2 == 0){
+						sum = sum + Head[0][i]*((Submatrix(1, i+1)).Det());
+					}else{
+						sum = sum -Head[0][i]*((Submatrix(1, i+1)).Det());
+					}
 				}
+				return sum;
 			}
-			return sum;
+		}
+		catch(size_t a)
+		{
+			std::cerr<<"NOT SQUARED MATRIX. ERROR CODE 1"<<std::endl;
 		}
 	}
 
@@ -253,7 +277,7 @@ std::vector< std::vector <T> > Head;
 		{
 			for(int j = 0 ; j < wight; j++)
 			{
-				if(std::abs(Head[j][i]) > epsilon and j >=a)
+				if(	abs(Head[j][i]) > epsilon and j >=a)
 				{
 					SwapLines(a,j);
 					b.SwapLines(a,j);
@@ -263,7 +287,7 @@ std::vector< std::vector <T> > Head;
 					{
 						b.SunMultipledFirstToSecond(a,k, T(-1)*Head[k][i]);
 						SunMultipledFirstToSecond(a,k, T(-1)*Head[k][i]);
-						std::cout << *this;
+						//std::cout << *this;
 					}
 					a++;
 					break;
@@ -280,13 +304,13 @@ std::vector< std::vector <T> > Head;
 			{
 				for (size_t j = 0; j < length; j++)
 				{
-					if(std::abs(Head[i][j]) > epsilon )
+					if(abs(Head[i][j]) > epsilon )
 					{
 						for (size_t k = i-1; k+1 >0; k--)
 						{
 							b.SunMultipledFirstToSecond(i,k, T(-1)*Head[k][j]);
 							SunMultipledFirstToSecond(i,k, T(-1)*Head[k][j]);
-							std::cout<<*this;
+							//std::cout<<*this;
 						}
 						break;
 					}
@@ -298,84 +322,92 @@ std::vector< std::vector <T> > Head;
 
 
 	Matrix& GaussMethod(Matrix &b){
-		//Приведение к почти верхнетреугольному виду
-		ToUpTringled(b);
-
-		//Перестановка столбцов:
-		int count = 0;
-		int swap_column = 1;
-		std::vector<std::vector<size_t>> swap;
-		while (count < wight)
+		try
 		{
-			if (std::abs(Head[count][count])<epsilon and (count + swap_column)<length )
+			if(wight != b.wight)
+				throw 2;
+			ToUpTringled(b);
+
+			//Перестановка столбцов:
+			int count = 0;
+			int swap_column = 1;
+			std::vector<std::vector<size_t>> swap;
+			while (count < wight)
 			{
-				SwapColumns(count+1, count + swap_column+1);
-				std::vector<size_t> transposition;
-				transposition.push_back(count);
-				transposition.push_back(count + swap_column);
-				swap.push_back(transposition);
-				std::cout<<"Swapped column " << count << "and column " << count + swap_column <<std::endl;
-				swap_column+=1;
-				transposition.clear();
-			}else{
-				count++;
-				swap_column = 1;
-			}
-		}
-		//Приведение к единичному виду
-		ToLed(b);
-
-		//Выписываем ФСР 
-		std::cout<<"FSS: " << std::endl;
-		size_t t = 0;
-		std::vector<std::vector<T>> FSS;
-		while(t<wight and std::abs(Head[t][t]) > epsilon)	{t++;} 
-		for (size_t i = 0; i<length; i++)
-		{
-			std::vector<T> FSS_str;
-			if(i<t){
-				for(size_t j = t; j < length; j++)
+				if (abs(Head[count][count]) < epsilon and (count + swap_column)<length )
 				{
-					FSS_str.push_back(T(-1)*Head[i][j]);
+					SwapColumns(count+1, count + swap_column+1);
+					std::vector<size_t> transposition;
+					transposition.push_back(count);
+					transposition.push_back(count + swap_column);
+					swap.push_back(transposition);
+					//std::cout<<"Swapped column " << count << "and column " << count + swap_column <<std::endl;
+					swap_column+=1;
+					transposition.clear();
+				}else{
+					count++;
+					swap_column = 1;
 				}
+			}
+			//Приведение к единичному виду
+			ToLed(b);
+
+			//Выписываем ФСР 
+			std::cout<<"FSS: " << std::endl;
+			size_t t = 0;
+			std::vector<std::vector<T>> FSS;
+			while(t<wight and abs(Head[t][t]) > epsilon)	{t++;} 
+			for (size_t i = 0; i<length; i++)
+			{
+				std::vector<T> FSS_str;
+				if(i<t){
+					for(size_t j = t; j < length; j++)
+					{
+						FSS_str.push_back(T(-1)*Head[i][j]);
+					}
+				}else{
+					for(size_t j = t; j < length; j++)
+					{
+						FSS_str.push_back(T((i==j)));
+					}
+				}
+				FSS.push_back(FSS_str);
+			}
+			Matrix FSS_matrix = Matrix(length, length-t, FSS);
+			std::cout<< FSS_matrix;
+			for (size_t i = 0; i<swap.size(); i++)
+			{
+				std::cout << "good1"<<std::endl;
+				FSS_matrix.SwapLines(swap[i][0], swap[i][1]);
+				std::cout << "good2"<<std::endl;
+			}
+
+			std::cout<< FSS_matrix;
+			std::cout<<"FSS all:" << std::endl;
+
+			//Проверка на совместность СЛУ
+			/*int flag = 0;
+			for (size_t i = wight-1; i+1>0; i--)
+			{
+				if ( std::abs(b.Head[i][0]) < epsilon){
+					for (size_t j = 0; j < length; j++){
+						if (std::abs(Head[i][j]) > epsilon){flag++;}
+					}
+				}
+			}
+			if (flag != 0){
+				std::cout<<"can't be solved :(";
 			}else{
-				for(size_t j = t; j < length; j++)
-				{
-					FSS_str.push_back(T((i==j)));
+				for  (size_t i =0; i<wight; i++){
+					std::cout<< b.Head[i][0] << std::endl;
 				}
-			}
-			FSS.push_back(FSS_str);
+			}*/
+			return *this;
 		}
-		Matrix FSS_matrix = Matrix(length, length-t, FSS);
-		std::cout<< FSS_matrix;
-		for (size_t i = 0; i<swap.size(); i++)
+		catch (size_t a)
 		{
-			std::cout << "good1"<<std::endl;
-			FSS_matrix.SwapLines(swap[i][0], swap[i][1]);
-			std::cout << "good2"<<std::endl;
+			std::cerr <<"Wrong size. Error code 2" << std::endl;
 		}
-
-		std::cout<< FSS_matrix;
-		std::cout<<"FSS all:" << std::endl;
-
-		//Проверка на совместность СЛУ
-		/*int flag = 0;
-		for (size_t i = wight-1; i+1>0; i--)
-		{
-			if ( std::abs(b.Head[i][0]) < epsilon){
-				for (size_t j = 0; j < length; j++){
-					if (std::abs(Head[i][j]) > epsilon){flag++;}
-				}
-			}
-		}
-		if (flag != 0){
-			std::cout<<"can't be solved :(";
-		}else{
-			for  (size_t i =0; i<wight; i++){
-				std::cout<< b.Head[i][0] << std::endl;
-			}
-		}*/
-		return *this;
 	}
 
 
@@ -393,6 +425,10 @@ std::vector< std::vector <T> > Head;
 
 template <typename T>
 Matrix<Polynom> ToCharPolynom( const Matrix<T>& b){
+	try
+	{
+		if(b.length != b.wight)
+			throw 1;
 		std::vector< std::vector< Polynom > > Head_polynom;
 		for (size_t i = 0; i<b.wight; i++)
 		{
@@ -412,6 +448,11 @@ Matrix<Polynom> ToCharPolynom( const Matrix<T>& b){
 		}
 		return Matrix<Polynom>(b.wight, b.length, Head_polynom);
 	}
+	catch(size_t a)
+	{
+		std::cerr<<"NOT SQUARED MATRIX. ERROR CODE 1"<<std::endl;
+	}
+}
 
 template <typename T>
 std::ostream& operator<<(std::ostream &os, const Matrix<T>& M)
