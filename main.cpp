@@ -6,9 +6,9 @@
 #include <complex>
 #include "Constants.h"
 //#include "Ring.h"
+#include "polynom.h"
 #include "Matrix.h"
 //#include "RationalNumber.h"
-#include "polynom.h"
 
 
 int main(int argc, char const *argv[])
@@ -51,5 +51,8 @@ int main(int argc, char const *argv[])
     Polynom q5(v6);
     std::vector<Polynom> tmp1 = DivideTwoPolynom(q4,q5);
     out_vector<Polynom>(tmp1);
+    Matrix<double> a1(5,5);
+    Matrix<double> b1(5,1);
+    a1.GaussMethod(b1);
 	return 0;
 }
