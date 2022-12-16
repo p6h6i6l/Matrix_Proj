@@ -339,4 +339,28 @@ void out_vector(std::vector<T>& vect)
 	return;
 }
 
+std::vector<std::vector<std::complex<double>>> multiplicity(const std::vector<std::complex<double>>& roots)
+{
+	std::vector<std::complex<double>> roots_copy = roots;
+	std::vector<std::vector<std::complex<double>>> mult;
+	for (size_t i = 0; i<roots_copy.size(); i++)
+	{
+		size_t count = 1;
+		std::vector<std::complex<double>> str = {roots_copy[i], std::complex<double>(count)};
+		for (size_t j = i+1; j-count+1<roots_copy.size(); j++)
+		{ 
+			if (std::abs(roots_copy[i] - roots_copy[j-count+1])<0.1)
+			{
+				auto begin = roots_copy.cbegin();
+				roots_copy.erase(begin+j-count+1);
+				count+=1;
+				str[1] +=1;
+			}
+		}
+		mult.push_back(str);
+		str.clear();
+	}
+	return mult;
+}
+
 
