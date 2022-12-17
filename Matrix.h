@@ -2,10 +2,18 @@ using namespace std;
 template <typename T>
 class Matrix final 
 {
-public: 
+private:
 size_t length; 
 size_t wight;
 std::vector< std::vector <T> > Head;
+template <typename Q>
+friend 
+Matrix<Polynom> ToCharPolynom( const Matrix<Q>& b);
+template <typename V>
+friend
+std::ostream& operator<<(std::ostream &os, const Matrix<V>& M);
+
+public:
 
 	Matrix()
 	{
@@ -31,7 +39,7 @@ std::vector< std::vector <T> > Head;
 		{	
 			for(size_t k = 0; k < length; k++)
 			{	
-				str.push_back(T(uniform_dist(e1), uniform_dist(e1)));
+				str.push_back(T(uniform_dist(e1)));
 			}
 			Head.push_back(str);
 			str.clear();
@@ -94,7 +102,7 @@ std::vector< std::vector <T> > Head;
 			}	
 			return Matrix(wight, length, tmp);
 		}
-		catch(size_t)
+		catch(int a)
 		{
 			std::cerr <<"Wrong size. Error code 2" << std::endl;
 		}
@@ -121,7 +129,7 @@ std::vector< std::vector <T> > Head;
 			}	
 			return Matrix(wight, length, tmp);
 		}
-		catch(size_t a)
+		catch(int a)
 		{
 			std::cerr <<"Wrong size. Error code 2" << std::endl;
 		}
@@ -150,7 +158,7 @@ std::vector< std::vector <T> > Head;
 			}	
 			return Matrix(wight, another.length, tmp);
 		}
-		catch(size_t)
+		catch(int a)
 		{
 			std::cerr <<"Wrong size. Error code 2" << std::endl;
 		}
@@ -263,10 +271,11 @@ std::vector< std::vector <T> > Head;
 				return sum;
 			}
 		}
-		catch(size_t a)
+		catch(int a)
 		{
 			std::cerr<<"NOT SQUARED MATRIX. ERROR CODE 1"<<std::endl;
 		}
+		return T(0);
 	}
 
 
@@ -321,7 +330,8 @@ std::vector< std::vector <T> > Head;
 	}
 
 
-	Matrix& GaussMethod(Matrix &b){
+	Matrix& GaussMethod(Matrix &b)
+	{
 		try
 		{
 			if(wight != b.wight)
@@ -344,7 +354,9 @@ std::vector< std::vector <T> > Head;
 					//std::cout<<"Swapped column " << count << "and column " << count + swap_column <<std::endl;
 					swap_column+=1;
 					transposition.clear();
-				}else{
+				}
+				else
+				{
 					count++;
 					swap_column = 1;
 				}
@@ -360,12 +372,15 @@ std::vector< std::vector <T> > Head;
 			for (size_t i = 0; i<length; i++)
 			{
 				std::vector<T> FSS_str;
-				if(i<t){
+				if(i<t)
+				{
 					for(size_t j = t; j < length; j++)
 					{
 						FSS_str.push_back(T(-1)*Head[i][j]);
 					}
-				}else{
+				}
+				else
+				{
 					for(size_t j = t; j < length; j++)
 					{
 						FSS_str.push_back(T((i==j)));
@@ -381,60 +396,44 @@ std::vector< std::vector <T> > Head;
 				FSS_matrix.SwapLines(swap[i][0], swap[i][1]);
 				std::cout << "good2"<<std::endl;
 			}
-
 			std::cout<< FSS_matrix;
 			std::cout<<"FSS all:" << std::endl;
-
-			//Проверка на совместность СЛУ
-			/*int flag = 0;
-			for (size_t i = wight-1; i+1>0; i--)
+			//Проверка на совместность СЛУ и вывод частного решения
+			std::cout<< "Partial solution: " << std::endl;
+			t = 0;
+			size_t flag = 0;
+			while(t < wight and std::abs(Head[t][t]) > epsilon){t++;}
+			for (size_t i = t; t<wight; t++)
 			{
-				if ( std::abs(b.Head[i][0]) < epsilon){
-					for (size_t j = 0; j < length; j++){
-						if (std::abs(Head[i][j]) > epsilon){flag++;}
+				if (abs(b.Head[t][0])>epsilon)
+				{
+					std::cout<< "System can't be solved :(" << std::endl;
+					flag = 1;
+					t = wight;
+				}
+			}
+			if (flag == 0)
+			{
+				std::vector<std::vector<T>> new_b_Head;
+				for (size_t j = 0; j<length; j++)
+				{
+					if(j<t)
+					{
+						(new_b_Head).push_back({b.Head[j][0]});
+					}
+					else
+					{
+						(new_b_Head).push_back({0});
 					}
 				}
+				std::cout<< Matrix(length, 1, new_b_Head);
 			}
-			if (flag != 0){
-				std::cout<<"can't be solved :(";
-			}else{
-				for  (size_t i =0; i<wight; i++){
-					std::cout<< b.Head[i][0] << std::endl;
-				}
-			}*/
 			return *this;
 		}
-		catch (size_t a)
+		catch (int  a)
 		{
-			std::cerr <<"Wrong size. Error code 2" << std::endl;
-		}
-
-		std::cout<< FSS_matrix;
-		std::cout<<"FSS all:" << std::endl;
-
-		//Проверка на совместность СЛУ и вывод частного решения
-		std::cout<< "Partial solution: " << std::endl;
-		t = 0;
-		size_t flag = 0;
-		while(t < wight and std::abs(Head[t][t]) > epsilon){t++;}
-		for (size_t i = t; t<wight; t++){
-			if (abs(b.Head[t][0])>epsilon){
-				std::cout<< "System can't be solved :(" << std::endl;
-				flag = 1;
-				t = wight;
-			}
-		}
-		if (flag == 0){
-			std::vector<std::vector<T>> new_b_Head;
-			for (size_t j = 0; j<length; j++)
-			{
-				if(j<t){
-					(new_b_Head).push_back({b.Head[j][0]});
-				}else{
-					(new_b_Head).push_back({0});
-				}
-			}
-			std::cout<< Matrix(length, 1, new_b_Head);
+			if( a == 2)
+				std::cerr <<"Wrong size. Error code 2" << std::endl;
 		}
 		return *this;
 	}
@@ -477,10 +476,12 @@ Matrix<Polynom> ToCharPolynom( const Matrix<T>& b){
 		}
 		return Matrix<Polynom>(b.wight, b.length, Head_polynom);
 	}
-	catch(size_t a)
+	catch(int a)
 	{
-		std::cerr<<"NOT SQUARED MATRIX. ERROR CODE 1"<<std::endl;
+		std::cerr<<"NOT SQUARED MATRIX. ERROR CODE 1, RETURNED EPMTY MATRIX"<<std::endl;
 	}
+	Matrix<Polynom> q; 
+	return q;
 }
 
 template <typename T>
