@@ -55,17 +55,19 @@ public:
 	}
 
 
-	Matrix(const Matrix &another)
+	Matrix(const Matrix<T> &another)
 	{
 		length = another.length;
 		wight = another.wight;
-		std::vector< std::vector<T> > Head;
 		for (size_t i = 0; i < wight; i++)
 		{
+			std::vector<T> Head_str;
 			for (size_t j = 0; j < length; j++)
 			{
-				Head[i][j] = another.Head[i][j];
+				Head_str.push_back(another.Head[i][j]);
 			}
+			Head.push_back(Head_str);
+			Head_str.clear();
 		}
 	}
 
@@ -286,7 +288,7 @@ public:
 		{
 			for(int j = 0 ; j < wight; j++)
 			{
-				if(	abs(Head[j][i]) > epsilon and j >=a)
+				if(	abs(Head[j][i]) > checking_roots_epsilon and j >=a)
 				{
 					SwapLines(a,j);
 					b.SwapLines(a,j);
@@ -313,7 +315,7 @@ public:
 			{
 				for (size_t j = 0; j < length; j++)
 				{
-					if(abs(Head[i][j]) > epsilon )
+					if(abs(Head[i][j]) > checking_roots_epsilon )
 					{
 						for (size_t k = i-1; k+1 >0; k--)
 						{
@@ -334,6 +336,7 @@ public:
 	{
 		try
 		{
+			Matrix<T> a_copy = *this;
 			if(wight != b.wight)
 				throw 2;
 			ToUpTringled(b);
@@ -344,7 +347,7 @@ public:
 			std::vector<std::vector<size_t>> swap;
 			while (count < wight)
 			{
-				if (abs(Head[count][count]) < epsilon and (count + swap_column)<length )
+				if (abs(Head[count][count]) < checking_roots_epsilon and (count + swap_column)<length )
 				{
 					SwapColumns(count+1, count + swap_column+1);
 					std::vector<size_t> transposition;
@@ -368,7 +371,7 @@ public:
 			std::cout<<"FSS: " << std::endl;
 			size_t t = 0;
 			std::vector<std::vector<T>> FSS;
-			while(t<wight and abs(Head[t][t]) > epsilon)	{t++;} 
+			while(t<wight and abs(Head[t][t]) > checking_roots_epsilon)	{t++;} 
 			for (size_t i = 0; i<length; i++)
 			{
 				std::vector<T> FSS_str;
@@ -389,7 +392,6 @@ public:
 				FSS.push_back(FSS_str);
 			}
 			Matrix FSS_matrix = Matrix(length, length-t, FSS);
-			std::cout<< FSS_matrix;
 			for (size_t i = 0; i<swap.size(); i++)
 			{
 				std::cout << "good1"<<std::endl;
@@ -402,10 +404,10 @@ public:
 			std::cout<< "Partial solution: " << std::endl;
 			t = 0;
 			size_t flag = 0;
-			while(t < wight and std::abs(Head[t][t]) > epsilon){t++;}
+			while(t < wight and std::abs(Head[t][t]) > checking_roots_epsilon){t++;}
 			for (size_t i = t; t<wight; t++)
 			{
-				if (abs(b.Head[t][0])>epsilon)
+				if (abs(b.Head[t][0])>checking_roots_epsilon)
 				{
 					std::cout<< "System can't be solved :(" << std::endl;
 					flag = 1;
@@ -420,28 +422,50 @@ public:
 					if(j<t)
 					{
 						(new_b_Head).push_back({b.Head[j][0]});
-					}
-					else
-					{
+					}else{
 						(new_b_Head).push_back({0});
 					}
 				}
 				std::cout<< Matrix(length, 1, new_b_Head);
 			}
+			*this = FSS_matrix;
 			return *this;
 		}
 		catch (int  a)
 		{
-			if( a == 2)
-				std::cerr <<"Wrong size. Error code 2" << std::endl;
+			std::cerr <<"Wrong size. Error code 2" << std::endl;
 		}
+
 		return *this;
 	}
 
 
-	std::vector<Matrix<T>> ToJordanForm()
+	void ToJordanForm()
 	{
+		Matrix<T> b(wight, 1);
+		Matrix<T> copy(*this);
+		for(size_t k = 0; k<wight; k++){b.Head[k][0]= 0;}
+
+		//Находим характеристический многочлен
 		Matrix<Polynom> q = ToCharPolynom(*this);
+		Polynom char_polynom = q.Det();
+		std::cout<< char_polynom;
+		std::vector<std::complex<double>> roots = char_polynom.FindRoots();
+		std::vector<std::vector<std::complex<double>>> mult = multiplicity(roots);
+		for (size_t i = 0; i<mult.size(); i++){
+			out_vector<std::complex<double>>(mult[i]);
+		}
+
+		//Считаем собственные векторы 
+		for (size_t i = 0; i < mult.size(); i++)
+		{
+			Matrix<T> copy_i = copy;
+			for(size_t k = 0; k<wight; k++){copy_i.Head[k][k]-=mult[i][0];}
+			std::cout<<"Gauss Method" << std::endl;
+			Matrix<std::complex<double>> FSS_i = copy_i.GaussMethod(b);
+			std::cout<<"Gauss Method END" << std::endl;
+		}
+
 	}
 
 
