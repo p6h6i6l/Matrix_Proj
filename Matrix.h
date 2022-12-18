@@ -1,11 +1,11 @@
-using namespace std;
+
 template <typename T>
 class Matrix final 
 {
 private:
-size_t length; 
-size_t wight;
-std::vector< std::vector <T> > Head;
+	size_t length; 
+	size_t wight;
+	std::vector< std::vector <T> > Head;
 template <typename Q>
 friend 
 Matrix<Polynom> ToCharPolynom( const Matrix<Q>& b);
@@ -237,6 +237,23 @@ public:
 		return *this;
 	}
 
+	Matrix& ChangeColumns (Matrix& column, size_t n)
+	{
+		if (wight != column.wight or n> length)
+		{
+			std::cout<<"Column size wrong. Can't push back.";
+			return *this;
+		}
+		for (size_t i = 0; i<wight; i++)
+		{
+			for (size_t j = 0; j<column.length; j++)
+			{
+				Head[i][j+n-1] = column.Head[i][j];
+			}
+		}
+		return *this;
+	}
+
 
 	Matrix Submatrix(size_t line, size_t column)
 	{
@@ -280,6 +297,67 @@ public:
 		return T(0);
 	}
 
+	Matrix Column(size_t n)
+	{
+		Matrix<T> column(wight, 1);
+		for(size_t i = 0; i<wight; i++)
+		{
+			column.Head[i][0] = Head[i][n];
+		}
+		return column;
+	}
+
+	bool CheckLineToZero (const Matrix& matrix, size_t n)
+	{
+		for (size_t i = 0; i<length; i++)
+		{
+			if (abs(Head[n][i])>gauss_epsilon ){return false;}
+		}
+		return true;
+
+	}
+
+	Matrix& ZeroLinesSwap(Matrix& b)
+	{
+		size_t swap = wight-1;
+		for (size_t i = 0; i<wight; i++)
+		{
+			if (CheckLineToZero(*this, i))
+			{
+				while (CheckLineToZero(*this, swap) and swap > i)
+				{
+					swap-=1;
+				}
+				SwapLines(i, swap);
+				b.SwapLines(i, swap);
+			}
+		}
+		return *this;
+	}
+
+	bool CheckColumnToZero(const Matrix& matrix, size_t n){
+		for (size_t i = 0; i<length; i++)
+		{
+			if (abs(Head[i][n])>gauss_epsilon ){return false;}
+		}
+		return true;
+	}
+
+	Matrix& RemoveZeroColumns()
+	{
+		for (size_t i = 0; i<length; i++)
+		{
+			if (CheckColumnToZero(*this, i))
+			{
+				length-=1;
+				for (size_t j = 0; j<wight; j++)
+				{
+					auto begin = Head[j].cbegin();
+					Head[j].erase(begin + i);
+				}
+			}
+		}
+	}
 
 	Matrix& ToUpTringled(Matrix& b)
 	{
@@ -288,8 +366,9 @@ public:
 		{
 			for(int j = 0 ; j < wight; j++)
 			{
-				if(	abs(Head[j][i]) > checking_roots_epsilon and j >=a)
+				if(	abs(Head[j][i]) > gauss_epsilon and j >=a)
 				{
+					//std::cout << "come " <<i << j << std::endl<< *this;
 					SwapLines(a,j);
 					b.SwapLines(a,j);
 					b.MultiplyByConstant(T(1)/(Head[a][i]), a);
@@ -298,7 +377,6 @@ public:
 					{
 						b.SunMultipledFirstToSecond(a,k, T(-1)*Head[k][i]);
 						SunMultipledFirstToSecond(a,k, T(-1)*Head[k][i]);
-						//std::cout << *this;
 					}
 					a++;
 					break;
@@ -308,14 +386,13 @@ public:
 		return *this;
 	}
 
-
 	Matrix& ToLed(Matrix &b)
 	{
 		for(size_t i = wight - 1; i+1 > 0; i--)
 			{
 				for (size_t j = 0; j < length; j++)
 				{
-					if(abs(Head[i][j]) > checking_roots_epsilon )
+					if(abs(Head[i][j]) > gauss_epsilon )
 					{
 						for (size_t k = i-1; k+1 >0; k--)
 						{
@@ -331,15 +408,17 @@ public:
 		return *this;
 	}
 
-
 	Matrix& GaussMethod(Matrix &b)
 	{
 		try
 		{
+			ZeroLinesSwap(b);
+			//std::cout<<*this;
 			Matrix<T> a_copy = *this;
 			if(wight != b.wight)
 				throw 2;
 			ToUpTringled(b);
+			//std::cout<<"after to up tringled"<< std::endl << *this;
 
 			//Перестановка столбцов:
 			int count = 0;
@@ -347,7 +426,8 @@ public:
 			std::vector<std::vector<size_t>> swap;
 			while (count < wight)
 			{
-				if (abs(Head[count][count]) < checking_roots_epsilon and (count + swap_column)<length )
+				//std::cout<<"transposition"<< count<< std::endl;
+				if (abs(Head[count][count]) < gauss_epsilon and (count + swap_column)<length )
 				{
 					SwapColumns(count+1, count + swap_column+1);
 					std::vector<size_t> transposition;
@@ -357,6 +437,7 @@ public:
 					//std::cout<<"Swapped column " << count << "and column " << count + swap_column <<std::endl;
 					swap_column+=1;
 					transposition.clear();
+					//std::cout<<"transposition"<< std::endl << *this;
 				}
 				else
 				{
@@ -364,14 +445,16 @@ public:
 					swap_column = 1;
 				}
 			}
+			//std::cout<<*this;
 			//Приведение к единичному виду
 			ToLed(b);
+			//std::cout<<"after to led"<< std::endl << *this;
 
 			//Выписываем ФСР 
 			std::cout<<"FSS: " << std::endl;
 			size_t t = 0;
 			std::vector<std::vector<T>> FSS;
-			while(t<wight and abs(Head[t][t]) > checking_roots_epsilon)	{t++;} 
+			while(t<wight and abs(Head[t][t]) > gauss_epsilon)	{t++;} 
 			for (size_t i = 0; i<length; i++)
 			{
 				std::vector<T> FSS_str;
@@ -394,9 +477,7 @@ public:
 			Matrix FSS_matrix = Matrix(length, length-t, FSS);
 			for (size_t i = 0; i<swap.size(); i++)
 			{
-				std::cout << "good1"<<std::endl;
 				FSS_matrix.SwapLines(swap[i][0], swap[i][1]);
-				std::cout << "good2"<<std::endl;
 			}
 			std::cout<< FSS_matrix;
 			std::cout<<"FSS all:" << std::endl;
@@ -404,10 +485,10 @@ public:
 			std::cout<< "Partial solution: " << std::endl;
 			t = 0;
 			size_t flag = 0;
-			while(t < wight and std::abs(Head[t][t]) > checking_roots_epsilon){t++;}
+			while(t < wight and std::abs(Head[t][t]) > gauss_epsilon){t++;}
 			for (size_t i = t; t<wight; t++)
 			{
-				if (abs(b.Head[t][0])>checking_roots_epsilon)
+				if (abs(b.Head[t][0])> gauss_epsilon)
 				{
 					std::cout<< "System can't be solved :(" << std::endl;
 					flag = 1;
@@ -442,27 +523,127 @@ public:
 
 	void ToJordanForm()
 	{
-		Matrix<T> b(wight, 1);
 		Matrix<T> copy(*this);
-		for(size_t k = 0; k<wight; k++){b.Head[k][0]= 0;}
+		Matrix<std::complex<double>> S(wight, wight);
+		Matrix<std::complex<double>> JNF(wight, wight);
+		Matrix<T> b(wight, wight);
+		for(size_t k = 0; k<wight; k++)
+		{	
+			for (size_t m = 0; m<wight; m++)
+			{
+				if (m==k){
+					JNF.Head[k][m] = 1;
+					b.Head[k][m]= 1;
+				}else{
+					JNF.Head[k][m] = 0;
+					b.Head[k][m]= 0;
+				}
+			}
+		}
+		std::cout<<b;
 
 		//Находим характеристический многочлен
 		Matrix<Polynom> q = ToCharPolynom(*this);
 		Polynom char_polynom = q.Det();
 		std::cout<< char_polynom;
 		std::vector<std::complex<double>> roots = char_polynom.FindRoots();
+		std::cout<< "ROOTS" << std::endl << roots;
 		std::vector<std::vector<std::complex<double>>> mult = multiplicity(roots);
 		for (size_t i = 0; i<mult.size(); i++){
 			out_vector<std::complex<double>>(mult[i]);
 		}
 
 		//Считаем собственные векторы 
+		size_t basis = 0;
 		for (size_t i = 0; i < mult.size(); i++)
 		{
 			Matrix<T> copy_i = copy;
 			for(size_t k = 0; k<wight; k++){copy_i.Head[k][k]-=mult[i][0];}
 			std::cout<<"Gauss Method" << std::endl;
 			Matrix<std::complex<double>> FSS_i = copy_i.GaussMethod(b);
+
+			//Ищем присоединенные векторы, если это нужно
+			if (FSS_i.length < abs(mult[i][1]))
+			{
+				std::cout<<"TOOOOOOOOO "<<i<<std::endl;
+				Matrix<std::complex<double>> pool = b*FSS_i;
+				std::cout<< "POOL" <<pool;
+				Matrix<std::complex<double>> add_vectors(FSS_i.length, FSS_i.length);
+
+				for (size_t j = 0; j < FSS_i.length; j++)
+				{
+					for (size_t k = 0; k < FSS_i.length; k++)
+					{
+						add_vectors.Head[j][k] = pool.Head[wight-FSS_i.length+j][k];
+					} 	
+				}
+				std::cout<<add_vectors;
+
+				Matrix<std::complex<double>>  Linear_coombinations = FSS_i*add_vectors;
+				std::vector<Matrix<T>> solutions;
+
+				Linear_coombinations.RemoveZeroColumns();
+				std::cout<< "LINEAR COOMBINATIONS"<<Linear_coombinations;
+				for (size_t l = 0; l<Linear_coombinations.length; l++)
+				{
+					solutions.push_back(Linear_coombinations.Column(l));
+				}
+				//std::cout<< "LINEAR COOMBINATIONS"<<solutions[];
+
+				std::cout<< "BEFORE FOR"<< std::endl <<S ;
+				std::cout<< "BEFOR FOR"<< std::endl <<JNF ;
+				for (size_t column = 0; column<solutions.size(); column++)
+				{
+
+					size_t zero = FSS_i.length;
+
+					S.ChangeColumns(solutions[column], basis + 1);
+					JNF.Head[basis][basis] = mult[i][0];
+					basis+=1;
+					std::cout<< "IN FOR"<< std::endl <<S ;
+					std::cout<< "IN FOR"<< std::endl <<JNF ;
+
+					while(zero == FSS_i.length)
+					{
+						std::cout<< "come to while"<< solutions[column]<< std::endl;
+						zero = 0;
+
+						Matrix<T> copy_2 = copy;
+						for(size_t k = 0; k<wight; k++){copy_2.Head[k][k]-=mult[i][0];}
+
+						copy_2.GaussMethod(solutions[column]);
+						for (size_t o = 0; o<FSS_i.length; o++)
+						{
+							std::vector<std::vector<std::complex<double>>> elem = (solutions[column]).Head;
+							if (abs(elem[o][0])<gauss_epsilon){zero+=1;}
+						}
+						std::cout<< "check zero "<< zero <<std::endl;
+
+						if (zero == FSS_i.length)
+						{
+							S.ChangeColumns(solutions[column], basis + 1);
+							JNF.Head[basis][basis] = mult[i][0];
+							JNF.Head[basis-1][basis] = 1;
+							basis+=1;
+							std::cout<< "FFFFFFFFFFFFFFFFFFFFFF"<< std::endl <<S ;
+							std::cout<< "FFFFFFFFFFFFFFFFFFFFFF"<< std::endl <<JNF ;
+						}
+
+					}
+				}
+
+			}else{
+				S.ChangeColumns(FSS_i, i + 1);
+				for (size_t l = 0; l<FSS_i.length; l++)
+				{
+					JNF.Head[l+basis][l+basis] = mult[i][0];
+				}
+				basis+=1;
+				std::cout<< "FFFFFFFFFFFFFFFFFFFFFF"<<S ;
+				std::cout<< "FFFFFFFFFFFFFFFFFFFFFF"<<JNF ;
+			}
+
+
 			std::cout<<"Gauss Method END" << std::endl;
 		}
 

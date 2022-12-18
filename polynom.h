@@ -303,9 +303,9 @@ std::vector<Polynom> DivideTwoPolynom(const Polynom& divisible,const Polynom& di
 
 void ZeroCheck(std::complex<double> &number)
 {
-	if(std::abs(number.real()) < epsilon)
-		number = std::complex<double>(0, number.imag());
-	if(std::abs(number.imag()) < epsilon)
+	if(abs(abs(number.real()) - abs(round(number.real()))) < epsilon)
+		number = std::complex<double>(round(number.real()), number.imag());
+	if(abs(number.imag()) < epsilon)
 		number = std::complex<double>(number.real(), 0);
 	return;
 }
@@ -349,7 +349,7 @@ std::vector<std::vector<std::complex<double>>> multiplicity(const std::vector<st
 		std::vector<std::complex<double>> str = {roots_copy[i], std::complex<double>(count)};
 		for (size_t j = i+1; j-count+1<roots_copy.size(); j++)
 		{ 
-			if (std::abs(roots_copy[i] - roots_copy[j-count+1])<0.1)
+			if (std::abs(roots_copy[i] - roots_copy[j-count+1])<0.2)
 			{
 				auto begin = roots_copy.cbegin();
 				roots_copy.erase(begin+j-count+1);
