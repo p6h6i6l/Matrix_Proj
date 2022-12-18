@@ -54,6 +54,26 @@ public:
 		Head = pool;
 	}
 
+	Matrix(size_t wight_, size_t length_, T i)
+	{
+		length = length_;
+		wight = wight_;
+		std::vector<std::vector<T>> b;
+		for(size_t k = 0; k<wight; k++)
+		{	
+			std::vector<T> b_str;
+			for (size_t m = 0; m<wight; m++)
+			{
+				if (m==k){
+					b_str.push_back(i);
+				}else{
+					b_str.push_back(i);
+				}
+			}
+			b.push_back(b_str);
+		}
+	}
+
 
 	Matrix(const Matrix<T> &another)
 	{
@@ -317,6 +337,15 @@ public:
 
 	}
 
+	bool CheckToZero ()
+	{
+		for (size_t i = 0; i<wight; i++)
+		{
+			if(!CheckLineToZero(*this, i)){return false;}
+		}
+		return true;
+	}
+
 	Matrix& ZeroLinesSwap(Matrix& b)
 	{
 		size_t swap = wight-1;
@@ -412,6 +441,11 @@ public:
 	{
 		try
 		{
+			if((*this).CheckToZero())
+			{
+				*this = Matrix<T>(wight, length, T(1));
+				return *this;
+			}
 			ZeroLinesSwap(b);
 			//std::cout<<*this;
 			Matrix<T> a_copy = *this;
@@ -582,12 +616,17 @@ public:
 				Matrix<std::complex<double>>  Linear_coombinations = FSS_i*add_vectors;
 				std::vector<Matrix<T>> solutions;
 
-				Linear_coombinations.RemoveZeroColumns();
 				std::cout<< "LINEAR COOMBINATIONS"<<Linear_coombinations;
 				for (size_t l = 0; l<Linear_coombinations.length; l++)
 				{
-					solutions.push_back(Linear_coombinations.Column(l));
+					if((Linear_coombinations.Column(l)).CheckToZero())
+					{
+						solutions.push_back(FSS_i.Column(l));
+					}else{
+						solutions.push_back(Linear_coombinations.Column(l));
+					}
 				}
+				Linear_coombinations.RemoveZeroColumns();
 				//std::cout<< "LINEAR COOMBINATIONS"<<solutions[];
 
 				std::cout<< "BEFORE FOR"<< std::endl <<S ;
@@ -612,10 +651,11 @@ public:
 						for(size_t k = 0; k<wight; k++){copy_2.Head[k][k]-=mult[i][0];}
 
 						copy_2.GaussMethod(solutions[column]);
-						for (size_t o = 0; o<FSS_i.length; o++)
+						std::cout<< "come to while: after gauss method"<< solutions[column]<< std::endl;
+						for (size_t v = 0; v<FSS_i.length; v++)
 						{
 							std::vector<std::vector<std::complex<double>>> elem = (solutions[column]).Head;
-							if (abs(elem[o][0])<gauss_epsilon){zero+=1;}
+							if (abs(elem[wight-v-1][0])<gauss_epsilon){zero+=1;}
 						}
 						std::cout<< "check zero "<< zero <<std::endl;
 
@@ -625,7 +665,7 @@ public:
 							JNF.Head[basis][basis] = mult[i][0];
 							JNF.Head[basis-1][basis] = 1;
 							basis+=1;
-							std::cout<< "FFFFFFFFFFFFFFFFFFFFFF"<< std::endl <<S ;
+							std::cout<< "FFFFFFFFFFFFFFFFFFFFFF" << basis << std::endl <<S ;
 							std::cout<< "FFFFFFFFFFFFFFFFFFFFFF"<< std::endl <<JNF ;
 						}
 
@@ -633,7 +673,7 @@ public:
 				}
 
 			}else{
-				S.ChangeColumns(FSS_i, i + 1);
+				S.ChangeColumns(FSS_i, basis + 1);
 				for (size_t l = 0; l<FSS_i.length; l++)
 				{
 					JNF.Head[l+basis][l+basis] = mult[i][0];
@@ -642,10 +682,10 @@ public:
 				std::cout<< "FFFFFFFFFFFFFFFFFFFFFF"<<S ;
 				std::cout<< "FFFFFFFFFFFFFFFFFFFFFF"<<JNF ;
 			}
-
-
 			std::cout<<"Gauss Method END" << std::endl;
 		}
+		std::cout<< "MATRIX TO JNF"<< std::endl << S ;
+		std::cout<< "JNF"<< std::endl <<JNF ;
 
 	}
 
