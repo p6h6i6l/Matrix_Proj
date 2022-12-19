@@ -1,8 +1,15 @@
-std::complex<double> ComplexZero(0,0);
-double epsilon = 0.0000001;
-double checking_roots_epsilon = 0.001;
-double gauss_epsilon = 0.1;
-double distribution_roots_epsilon = 0.001;
-double pi = 3.1415;
-long long number_of_steps = 1000000;
-long long number_of_cheking_roots = 10;
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+#include "SomeLibs.h"
+
+extern std::complex<double> ComplexZero;
+extern double epsilon;
+extern double checking_roots_epsilon;
+extern double gauss_epsilon;
+extern double distribution_roots_epsilon;
+extern double pi;
+extern int number_of_steps;
+extern int number_of_cheking_roots;
+
+#endif // CONSTANTS_H

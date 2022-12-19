@@ -1,0 +1,4 @@
+OurProj: polynom.cpp Matrix.cpp RationalNumber.cpp Constants.cpp Tests.cpp main.cpp
+	g++ -o OurProj polynom.cpp Matrix.cpp RationalNumber.cpp Constants.cpp Tests.cpp main.cpp
+	ar -rs mylibrarry.a polynom.o Matrix.o Tests.o RationalNumber.o Constants.o 
+	
